@@ -93,7 +93,7 @@ contract Marketplace {
     require(order.creator != address(0x0));
 
     // Check transfered ETH value
-    uint256 expectedEthAmount = getExpectedEthAmount(order);
+    uint256 expectedEthAmount = _getExpectedEthAmount(order);
     require(expectedEthAmount <= msg.value);
 
     // Transfer token
@@ -101,15 +101,19 @@ contract Marketplace {
     nftContract.transferFrom(address(this), msg.sender, order.tokenId);
   }
 
-  function getExpectedEthAmount(SellOrder storage order) private view returns(uint256) {
+  function getExpectedEthAmount(uint256 orderId) external view returns(uint256) {
+    SellOrder storage order = sellOrders[orderId];
+    return _getExpectedEthAmount(order);
+  }
+
+  function _getExpectedEthAmount(SellOrder storage order) private view returns(uint256) {
     if (order.currency == Currency.ETH) {
       return order.price;
     } else {
-      return order.price * 3000; // TODO: connect redstone
+      return order.price / 3000; // TODO: connect redstone
     }
   }
 
-  // TODO: add for web app
-  // getListedNftsCount()
-  // getListedNftInfo(index)
+  // TODO: maybe add view functions to get orders and order details
+  // It can be used in the reference dApp frontend code
 }
