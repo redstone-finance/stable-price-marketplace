@@ -1,6 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
+// TODO: add implementation for full coverage tests
 describe("Marketplace full test", function () {
   let marketplaceContract, exampleNFTContract;
 

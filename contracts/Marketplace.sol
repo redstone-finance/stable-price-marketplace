@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "redstone-evm-connector/lib/contracts/message-based/PriceAware.sol";
 
-contract Marketplace {
+contract Marketplace is PriceAware {
   enum Currency { ETH, USD }
   enum OrderStatus { ACTIVE, CANCELED, EXECUTED }
 
@@ -101,18 +101,33 @@ contract Marketplace {
     nftContract.transferFrom(address(this), msg.sender, order.tokenId);
   }
 
-  function getExpectedEthAmount(uint256 orderId) external view returns(uint256) {
-    SellOrder storage order = sellOrders[orderId];
-    return _getExpectedEthAmount(order);
-  }
-
-  function _getExpectedEthAmount(SellOrder storage order) private view returns(uint256) {
-    if (order.currency == Currency.ETH) {
-      return order.price;
-    } else {
-      return order.price / 3000; // TODO: connect redstone
+  function getExpectedEthAmount(uint256 orderId)
+    external
+    view
+    returns(uint256) {
+      SellOrder storage order = sellOrders[orderId];
+      return _getExpectedEthAmount(order);
     }
-  }
+
+  function _getExpectedEthAmount(SellOrder storage order)
+    private
+    view
+    returns(uint256) {
+      if (order.currency == Currency.ETH) {
+        return order.price;
+      } else {
+        return order.price / getPriceFromMsg(bytes32("ETH")) * (10 ** 8);
+      }
+    }
+
+  function isSignerAuthorized(address _receviedSigner)
+    public
+    override
+    virtual
+    view
+    returns (bool) {
+      return _receviedSigner == 0x0C39486f770B26F5527BBBf942726537986Cd7eb;
+    }
 
   // TODO: maybe add view functions to get orders and order details
   // It can be used in the reference dApp frontend code

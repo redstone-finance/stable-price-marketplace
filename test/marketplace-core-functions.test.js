@@ -1,8 +1,13 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
+const { WrapperBuilder } = require("redstone-evm-connector");
 
 describe("Marketplace core functions test", function () {
-  let marketplaceContract, exampleNFTContract, nftContractAddress, marketplaceAddress;
+  let marketplaceContract,
+    exampleNFTContract,
+    nftContractAddress,
+    marketplaceAddress,
+    wrappedMarketplaceContract;
 
   it("Should deploy contracts", async function () {
     // Deploy marketplace contract
@@ -103,16 +108,22 @@ describe("Marketplace core functions test", function () {
     expect(await exampleNFTContract.ownerOf(tokenId)).to.equal(marketplaceAddress);
   });
 
-  it("Buying should fail with smaller amount then seller requested", async function () {
+  it("Should wrap marketplace contract with redstone wrapper", async function () {
     const [_user1, user2] = await ethers.getSigners();
+    wrappedMarketplaceContract = WrapperBuilder
+      .wrapLite(marketplaceContract.connect(user2))
+      .usingPriceFeed("redstone", { asset: "ETH" });
+  });
+
+  it("Buying should fail with smaller amount then seller requested", async function () {
     const orderId = 2;
 
     // Get expected ether amount
-    const expectedEthAmount = await marketplaceContract.getExpectedEthAmount(orderId);
+    const expectedEthAmount = await wrappedMarketplaceContract.getExpectedEthAmount(orderId);
     logExpectedAmount(expectedEthAmount);
 
     // Trying to buy (should fail)
-    await expect(marketplaceContract.connect(user2).buy(orderId, {
+    await expect(wrappedMarketplaceContract.buy(orderId, {
       value: expectedEthAmount.mul(7).div(10), // We multiply the value by 0.7
     })).to.be.reverted;
   });
@@ -122,11 +133,11 @@ describe("Marketplace core functions test", function () {
     const orderId = 2;
 
     // Get expected ether amount
-    const expectedEthAmount = await marketplaceContract.getExpectedEthAmount(orderId);
+    const expectedEthAmount = await wrappedMarketplaceContract.getExpectedEthAmount(orderId);
     logExpectedAmount(expectedEthAmount);
 
     // Send buy tx from user 2 wallet
-    const buyTx = await marketplaceContract.connect(user2).buy(orderId, {
+    const buyTx = await wrappedMarketplaceContract.buy(orderId, {
       value: expectedEthAmount.mul(105).div(100), // We add 5% for potential price slippage
     });
     await buyTx.wait();
