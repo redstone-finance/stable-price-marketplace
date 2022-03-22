@@ -1,6 +1,5 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
-const { WrapperBuilder } = require("redstone-evm-connector");
 
 describe("Marketplace core functions test", function () {
   let marketplaceContract,
