@@ -25,7 +25,7 @@ describe("Marketplace core functions test", function () {
     await exampleNFTContract.deployed();
     nftContractAddress = exampleNFTContract.address;
 
-    //Should map users
+    // Should map users
     [seller, buyer] = await ethers.getSigners();
   });
 

@@ -5,7 +5,11 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "redstone-evm-connector/lib/contracts/message-based/PriceAware.sol";
 
 contract Marketplace {
-    enum OrderStatus { ACTIVE, CANCELED, EXECUTED }
+    enum OrderStatus {
+        ACTIVE,
+        CANCELED,
+        EXECUTED
+    }
 
     struct SellOrder {
         address nftContractAddress;
@@ -15,14 +19,13 @@ contract Marketplace {
         OrderStatus status;
     }
 
-    SellOrder[] public sellOrders;
+    SellOrder[] private sellOrders;
 
     function postSellOrder(
         address nftContractAddress,
         uint256 tokenId,
         uint256 price
     ) external {
-
         // Check if tokenId is owned by tx sender
         IERC721 nftContract = IERC721(nftContractAddress);
         require(nftContract.ownerOf(tokenId) == msg.sender);
@@ -32,22 +35,22 @@ contract Marketplace {
         nftContract.transferFrom(msg.sender, address(this), tokenId);
 
         // Save order in the sellOrders mapping
-        sellOrders.push(SellOrder(
-            nftContractAddress,
-            tokenId,
-            msg.sender,
-            price,
-            OrderStatus.ACTIVE
-        ));
+        sellOrders.push(
+            SellOrder(
+                nftContractAddress,
+                tokenId,
+                msg.sender,
+                price,
+                OrderStatus.ACTIVE
+            )
+        );
     }
-
 
     function cancelOrder(uint256 orderId) external {
         // Only order creator can cancel the order
         require(sellOrders[orderId].creator == msg.sender);
         sellOrders[orderId].status = OrderStatus.CANCELED;
     }
-
 
     function buy(uint256 orderId) external payable {
         // Order must exist and be in the active state
@@ -63,25 +66,23 @@ contract Marketplace {
         nftContract.transferFrom(address(this), msg.sender, order.tokenId);
     }
 
-
-    function _getPriceFromOrder(SellOrder memory order) internal virtual view returns(uint256) {
+    function _getPriceFromOrder(SellOrder memory order)
+        internal
+        view
+        virtual
+        returns (uint256)
+    {
         return order.price;
     }
 
+    // Getters for the UI
 
-    //Getters for the UI
-
-    function getPrice(uint256 orderId) public view returns(uint256) {
+    function getPrice(uint256 orderId) public view returns (uint256) {
         SellOrder storage order = sellOrders[orderId];
         return _getPriceFromOrder(order);
     }
 
-
-    function getAllOrders() public view returns(SellOrder[] memory) {
+    function getAllOrders() public view returns (SellOrder[] memory) {
         return sellOrders;
     }
-
-
-
-
 }
