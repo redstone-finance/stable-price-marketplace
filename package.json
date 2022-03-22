@@ -6,7 +6,10 @@
   "author": "hatskier <suvorovalex1997@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "run-local-node": "hardhat node",
+    "deploy-contracts:local": "hardhat run --network hardhat scripts/deploy-contracts.js",
+    "deploy-contracts:fuji": "hardhat run --network fuji scripts/deploy-contracts.js"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",

@@ -109,6 +109,9 @@ coverage
 coverage.json
 typechain
 
-#Hardhat files
+# Hardhat files
 cache
 artifacts
+
+# Private keys (to deploy on Fuji)
+.private-keys.json
