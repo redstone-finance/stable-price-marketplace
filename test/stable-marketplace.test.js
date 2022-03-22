@@ -58,7 +58,7 @@ describe("Marketplace core functions test", function () {
     it("Should wrap marketplace contract with redstone wrapper", async function () {
       wrappedMarketplaceContract = WrapperBuilder
         .wrapLite(marketplaceContract.connect(buyer))
-        .usingPriceFeed("redstone", { asset: "ETH" });
+        .usingPriceFeed("redstone", { asset: "AVAX" });
     });
 
 
@@ -71,7 +71,7 @@ describe("Marketplace core functions test", function () {
 
       // Trying to buy (should fail)
       await expect(wrappedMarketplaceContract.buy(orderId, {
-        value: expectedAvaxAmount.mul(7).div(10), // We multiply the value by 0.7
+        value: expectedAvaxAmount.mul(99).div(100)
       })).to.be.reverted;
     });
 
@@ -84,7 +84,7 @@ describe("Marketplace core functions test", function () {
 
       // Send buy tx from user 2 wallet
       const buyTx = await wrappedMarketplaceContract.buy(orderId, {
-        value: expectedAvaxAmount
+        value: expectedAvaxAmount.mul(101).div(100) // a buffer for price movements
       });
       await buyTx.wait();
 

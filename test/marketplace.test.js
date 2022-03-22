@@ -75,7 +75,7 @@ describe("Marketplace core functions test", function () {
 
     // Send buy tx from buyer's wallet
     const buyTx = await marketplaceContract.connect(buyer).buy(orderId, {
-      value: expectedAvaxAmount,
+      value: expectedAvaxAmount.mul(101).div(100), // a buffer for price movements
     });
     await buyTx.wait();
 

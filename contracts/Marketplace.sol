@@ -77,7 +77,7 @@ contract Marketplace {
     }
 
 
-    function getAllOrders() public view returns(SellOrder[]) {
+    function getAllOrders() public view returns(SellOrder[] memory) {
         return sellOrders;
     }
 

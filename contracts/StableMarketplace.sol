@@ -8,7 +8,7 @@ import "./Marketplace.sol";
 contract StableMarketplace is Marketplace, PriceAware {
 
   function _getPriceFromOrder(SellOrder memory order) internal override view returns(uint256) {
-    return order.price / getPriceFromMsg(bytes32("ETH")) * (10 ** 8);
+    return order.price / getPriceFromMsg(bytes32("AVAX")) * (10 ** 8);
   }
 
 
