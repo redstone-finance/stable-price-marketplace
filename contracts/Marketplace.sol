@@ -50,9 +50,9 @@ contract Marketplace {
 
 
     function buy(uint256 orderId) external payable {
-        // Order must exist
+        // Order must exist and be in the active state
         SellOrder storage order = sellOrders[orderId];
-        require(order.status != OrderStatus.ACTIVE);
+        require(order.status == OrderStatus.ACTIVE);
 
         // Check transfered ETH value
         uint256 expectedAvaxAmount = _getPriceFromOrder(order);
@@ -69,9 +69,16 @@ contract Marketplace {
     }
 
 
+    //Getters for the UI
+
     function getPrice(uint256 orderId) public view returns(uint256) {
         SellOrder storage order = sellOrders[orderId];
         return _getPriceFromOrder(order);
+    }
+
+
+    function getAllOrders() public view returns(SellOrder[]) {
+        return sellOrders;
     }
 
 
