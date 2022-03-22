@@ -52,7 +52,7 @@ contract Marketplace {
     function buy(uint256 orderId) external payable {
         // Order must exist
         SellOrder storage order = sellOrders[orderId];
-        require(order.creator != address(0x0));
+        require(order.status != OrderStatus.ACTIVE);
 
         // Check transfered ETH value
         uint256 expectedAvaxAmount = _getPriceFromOrder(order);
