@@ -54,6 +54,12 @@ describe("Marketplace core functions test", function () {
     expect(await exampleNFTContract.ownerOf(tokenId)).to.equal(marketplaceAddress);
   });
 
+  it("Should get all orders", async function () {
+    const allOrders = await marketplaceContract.getAllOrders();
+    expect(allOrders.length).to.equal(1);
+    expect(allOrders[0].tokenId).to.equal(1);
+  });
+
   it("Buying should fail with smaller amount then seller requested", async function () {
     const orderId = 0;
 
