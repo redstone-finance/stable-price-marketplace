@@ -12,11 +12,11 @@ describe("ExampleNFT", function () {
 
   it("Should mint 2 NFTs", async function () {
     // Mint first NFT
-    const mintTx1 = await exampleNFTContract.mint(1);
+    const mintTx1 = await exampleNFTContract.mint();
     await mintTx1.wait();
 
     // Mint second NFT
-    const mintTx2 = await exampleNFTContract.mint(2);
+    const mintTx2 = await exampleNFTContract.mint();
     await mintTx2.wait();
 
     // Verify NFT ownership

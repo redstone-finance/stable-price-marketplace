@@ -31,7 +31,7 @@ describe("Marketplace core functions test", function () {
 
   it("Should mint NFT", async function () {
     // Mint first NFT
-    const mintTx1 = await exampleNFTContract.mint(1);
+    const mintTx1 = await exampleNFTContract.mint();
     await mintTx1.wait();
   });
 

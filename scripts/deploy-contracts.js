@@ -24,7 +24,7 @@ async function deployContract(name, ...args) {
 
 // for local env and for fuji testnet
 function updateAddressesFile(addresses) {
-  const addressesFilePath = `./config/${hre.network.name}-addresses.json`;
+  const addressesFilePath = `./src/config/${hre.network.name}-addresses.json`;
   console.log(`Saving addresses to ${addressesFilePath}`);
   fs.writeFileSync(addressesFilePath, JSON.stringify(addresses, null, 2) + "\n");
 }

@@ -47,9 +47,17 @@ contract Marketplace {
     }
 
     function cancelOrder(uint256 orderId) external {
+        SellOrder storage order = sellOrders[orderId];
+
         // Only order creator can cancel the order
-        require(sellOrders[orderId].creator == msg.sender);
-        sellOrders[orderId].status = OrderStatus.CANCELED;
+        require(order.creator == msg.sender);
+
+        // Transfer NFT back to user
+        IERC721 nftContract = IERC721(order.nftContractAddress);
+        nftContract.transferFrom(address(this), msg.sender, order.tokenId);
+
+        // Update order status
+        order.status = OrderStatus.CANCELED;
     }
 
     function buy(uint256 orderId) external payable {

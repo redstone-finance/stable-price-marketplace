@@ -1,7 +1,14 @@
-import { WrapperBuilder } from "redstone-evm-connector";
+// import { WrapperBuilder } from "redstone-evm-connector";
 import { ethers } from "ethers";
-import fujiAddresses from "../config/fuji-addresses.json";
-import hardhatAddresses from "../config/hardhat-addresses.json";
+import fujiAddresses from "./config/fuji-addresses.json";
+import hardhatAddresses from "./config/local-addresses.json";
+import nftAbi from "./config/nft-abi.json";
+import marketplaceAbi from "./config/marketplace-api.json";
+
+const ABIs = {
+  nft: nftAbi,
+  marketplace: marketplaceAbi,
+};
 
 // TODO: check connected network
 async function getContractAddress(contractName) {
@@ -11,26 +18,63 @@ async function getContractAddress(contractName) {
     : fujiAddresses[contractName];
 }
 
-// TODO: implement
-async function getContractInstance(contractName) {
-
+async function getSigner() {
+  await ethereum.enable();
+  const signer = (new ethers.providers.Web3Provider(window.ethereum)).getSigner();
+  return signer;
 }
 
-// TODO: implement
+async function getContractInstance(contractName) {
+  const abi = ABIs[contractName];
+  const address = await getContractAddress(contractName);
+  const signer = await getSigner();
+  console.log(address);
+  return new ethers.Contract(address, abi, signer);
+}
+
+async function connectWallet() {
+  await window.ethereum.request({ method: 'eth_requestAccounts' });
+}
+
+function onAddressChange(callback) {
+  ethereum.on("accountsChanged", callback);
+}
+
+async function getUserAddress() {
+  const signer = await getSigner();
+  return await signer.getAddress();
+}
+
 async function getOwnedNfts(address) {
   const nft = await getContractInstance("nft");
-  return [1];
+  const nftCount = await nft.balanceOf(address);
+  const tokenIds = [];
+  for (let i = 0; i < nftCount; i++) {
+    const tokenId = await nft.tokenOfOwnerByIndex(address, i);
+    tokenIds.push(tokenId);
+  }
+  return tokenIds;
 }
 
 async function mintNft() {
-  const newTokenId = Date.now() + Math.round(Math.random() * 1_000_000);
   const nft = await getContractInstance("nft");
-  return await nft.mint(newTokenId);
+  const tx = await nft.mint();
+  await tx.wait();
+  return tx;
 }
 
 async function getAllOrders() {
   const marketplace = await getContractInstance("marketplace");
-  return await marketplace.getAllOrders();
+  const orders = await marketplace.getAllOrders();
+  return orders
+    .map((order, index) => ({
+      orderId: index,
+      tokenId: order.tokenId.toNumber(),
+      usdPrice: bigBlockchainNumberToNumber(order.price),
+      creator: order.creator,
+      status: order.status,
+    }))
+    .filter(order => order.status === 0);
 }
 
 async function postOrder({ tokenId, usdPrice }) {
@@ -42,14 +86,24 @@ async function postOrder({ tokenId, usdPrice }) {
   await approveTx.wait();
 
   // Posting order tx
-  return await marketplace.postSellOrder(
+  const postOrderTx = await marketplace.postSellOrder(
     nftContract.address,
     tokenId,
     numberToBigBlockchainNumberString(usdPrice)
   );
+  await postOrderTx.wait();
+}
+
+async function cancelOrder(orderId) {
+  const marketplace = await getContractInstance("marketplace");
+  const cancelTx = await marketplace.cancelOrder(orderId);
+  await cancelTx.wait();
+  return cancelTx;
 }
 
 async function buy(orderId) {
+  alert(`Buying order: ${orderId}`);
+
   const marketplace = await getContractInstance("marketplace");
 
   // Wrapping marketplace contract instance.
@@ -71,6 +125,14 @@ async function buy(orderId) {
   return buyTx;
 }
 
+function shortenAddress(address) {
+  return address.slice(0, 7) + ".." + address.slice(address.length - 7);
+}
+
+function bigBlockchainNumberToNumber(value) {
+  return ethers.utils.formatEther(value);
+}
+
 function numberToBigBlockchainNumberString(value) {
   return ethers.utils.parseEther(String(value));
 }
@@ -81,5 +143,11 @@ export default {
   mintNft,
   getAllOrders,
   postOrder,
+  cancelOrder,
   buy,
+
+  connectWallet,
+  getUserAddress,
+  shortenAddress,
+  onAddressChange,
 };

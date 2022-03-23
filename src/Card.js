@@ -7,13 +7,17 @@ export default function Card(props) {
           NFT #{props.tokenId}
         </div>
       </div>
+
+      <div class="price">
+        {props.price ? `$${props.price}` : ``}
+      </div>
       
       <div className="post-sell-order-button-container">
         <a
           className="button"
           href="#"
           style={{color: props.buttonTextColor}}
-          onClick={() => alert(props)}
+          onClick={() => props.onButtonClick(props.tokenId)}
         >
           {props.buttonText}
         </a>

@@ -103,7 +103,12 @@
 
     #nft-secion {
       border-right: 1px solid #ddd;
-      min-height: 120vh;    
+      min-height: 120vh;
+
+      .mint-new-nft-link {
+        margin-top: 20px;
+        color: #777;
+      }
     }
 
     .nft-token-id {
@@ -120,6 +125,10 @@
       .left {
         display: flex;
         align-items: center;
+      }
+
+      .price {
+        font-size: 14px;
       }
     }
   }

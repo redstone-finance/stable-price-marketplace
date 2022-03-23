@@ -6,7 +6,6 @@ describe("Marketplace core functions test", function () {
     exampleNFTContract,
     nftContractAddress,
     marketplaceAddress,
-    wrappedMarketplaceContract,
     seller, buyer;
 
   const tokenId = 1;
@@ -30,7 +29,7 @@ describe("Marketplace core functions test", function () {
 
   it("Should mint NFT", async function () {
     // Mint first NFT
-    const mintTx1 = await exampleNFTContract.mint(1);
+    const mintTx1 = await exampleNFTContract.mint();
     await mintTx1.wait();
   });
 
@@ -87,6 +86,27 @@ describe("Marketplace core functions test", function () {
     // Check NFT owner
     expect(await exampleNFTContract.ownerOf(tokenId)).to.equal(buyer.address);
   });
+
+  it("Should post and cancel order", async function () {
+    const tokenId = 1;
+
+    // Approve NFT transfer
+    const approveTx = await exampleNFTContract.connect(buyer).approve(marketplaceContract.address, tokenId);
+    await approveTx.wait();
+
+    // Post sell order
+    const avaxPrice = ethers.utils.parseEther("1");
+    const postOrderTx = await marketplaceContract.connect(buyer).postSellOrder(
+      nftContractAddress,
+      tokenId,
+      avaxPrice
+    );
+    await postOrderTx.wait();
+
+    // Cancel order
+    const cancelTx = await marketplaceContract.connect(buyer).cancelOrder(1);
+    await cancelTx.wait();
+  })
 
 });
 

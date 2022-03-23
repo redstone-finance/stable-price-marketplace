@@ -26,7 +26,10 @@ module.exports = {
   solidity: "0.8.4",
   defaultNetwork: "hardhat",
   networks: {
-    hardhat: {},
+    local: {
+      url: "http://localhost:8545",
+      chainId: 31337,
+    },
     fuji: {
       url: "https://api.avax-test.network/ext/bc/C/rpc",
       gasPrice: 225000000000,
