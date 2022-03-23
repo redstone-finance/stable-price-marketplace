@@ -114,11 +114,11 @@ export default function App() {
         </div>
       </div>
 
-      <div id="logo" className="card-with-shadow">
+      <div id="logo">
         Stable marketplace
       </div>
 
-      <div id="wallet-connector" className="card-with-shadow">
+      <div id="wallet-connector">
         {address
           ? (blockchain.shortenAddress(address))
           : (<a className="button" href="#" onClick={blockchain.connectWallet}>Connect wallet</a>)

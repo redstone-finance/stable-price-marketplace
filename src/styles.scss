@@ -9,8 +9,10 @@
     left: 30px;
     font-size: 18px;
     font-weight: 500;
-    padding: 14px 20px;
+    // padding: 14px 20px;
     color: #3e80c8;
+    // border-top: 3px solid #3e80c8;
+    border-bottom: 3px solid #3e80c8;
   }
 
   .card-with-shadow {
@@ -35,7 +37,7 @@
     position: fixed;
     top: 30px;
     right: 30px;
-    padding: 14px 20px;
+    // padding: 14px 20px;
     color: #3e80c8;
     a {
       color: #3e80c8;
