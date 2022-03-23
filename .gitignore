@@ -115,3 +115,5 @@ artifacts
 
 # Private keys (to deploy on Fuji)
 .private-keys.json
+
+.DS_Store
