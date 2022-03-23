@@ -60,25 +60,24 @@ You can see more keys in your console below the `yarn run-local-node`
 
 #### 7. Explore the app in browser
 
-![stable-marketplace-app](docs/img/stable-marketplace-app.png)
+<img alt="stable-marketplace-app" src="docs/img/stable-marketplace-app.png" width="800" />
 
 ##### Mint NFTs
-After visiting the app first time you will see an almost empty screen with the `+ Mint new NFT` link. Click this link to mint new NFTs.
+After visiting the app first time you will see an almost empty screen with the `+ Mint new NFT` link. Click this link to mint new NFTs. After the minting transaction confirmation you will see your NFT in the left column.
 
-![my-nfts](docs/img/my-nfts.png)
+<img alt="my-nfts" src="docs/img/my-nfts.png" width="300" />
 
 ##### Post sell orders
 Once you mint any NFTs, you can post sell order for each one of them. Click the SELL button and provide the USD value. You will be asked to confirm 2 transactions: for NFT transfer approval, and for the marketplace order creation. After their confirmation, you will see your order in the Orders column.
 
-![orders](docs/img/orders.png)
+<img alt="orders" src="docs/img/orders.png" width="300" />
 
 ##### Buy NFTs
 You can also switch metamask account and buy the NFT. I would recommend to open the developer tools in browser at the network tab and explore network requests that are being sent before the buy transaction sending.
 
 You should see at least 2 requests with the AVAX price data and crypto signatures. This data along with signatures is being attached for each contract call, that wants to process redstone oracle data.
 
-![redstone-requests](docs/img/redstone-requests.png)
-
+<img alt="redstone-requests" src="docs/img/redstone-requests.png" width="800" />
 
 
 
