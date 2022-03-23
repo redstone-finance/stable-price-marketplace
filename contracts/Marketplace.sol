@@ -72,6 +72,9 @@ contract Marketplace {
         // Transfer NFT
         IERC721 nftContract = IERC721(order.nftContractAddress);
         nftContract.transferFrom(address(this), msg.sender, order.tokenId);
+
+        // Mark order as executed
+        order.status = OrderStatus.EXECUTED;
     }
 
     function _getPriceFromOrder(SellOrder memory order)

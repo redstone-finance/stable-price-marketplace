@@ -8,7 +8,6 @@ import "./Marketplace.sol";
 // StableMarketplace contract extends PriceAware contract
 // For being able to use redstone oracles data
 contract StableMarketplace is Marketplace, PriceAware {
-
     // You can check addresses for authorized redstone signers at:
     // https://github.com/redstone-finance/redstone-evm-connector/blob/master/README.md#1-modifying-your-contracts
     function isSignerAuthorized(address _signer)
@@ -29,5 +28,16 @@ contract StableMarketplace is Marketplace, PriceAware {
         returns (uint256)
     {
         return (order.price / getPriceFromMsg(bytes32("AVAX"))) * (10**8);
+    }
+
+    // Optional function for data package timestamp validation
+    function isTimestampValid(uint256 _receivedTimestamp)
+        public
+        pure
+        override
+        returns (bool)
+    {
+        _receivedTimestamp;
+        return true;
     }
 }

@@ -11,7 +11,7 @@
     "app:eject": "react-scripts eject",
     "test": "hardhat test",
     "run-local-node": "hardhat node",
-    "deploy-contracts:local": "hardhat run --network hardhat scripts/deploy-contracts.js",
+    "deploy-contracts:local": "hardhat run --network local scripts/deploy-contracts.js",
     "deploy-contracts:fuji": "hardhat run --network fuji scripts/deploy-contracts.js"
   },
   "devDependencies": {
