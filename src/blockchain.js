@@ -19,7 +19,7 @@ async function getContractAddress(contractName) {
 }
 
 async function getSigner() {
-  await ethereum.enable();
+  await connectWallet();
   const signer = (new ethers.providers.Web3Provider(window.ethereum)).getSigner();
   return signer;
 }
@@ -28,7 +28,6 @@ async function getContractInstance(contractName) {
   const abi = ABIs[contractName];
   const address = await getContractAddress(contractName);
   const signer = await getSigner();
-  console.log(address);
   return new ethers.Contract(address, abi, signer);
 }
 
@@ -102,8 +101,6 @@ async function cancelOrder(orderId) {
 }
 
 async function buy(orderId) {
-  alert(`Buying order: ${orderId}`);
-
   const marketplace = await getContractInstance("marketplace");
 
   // Wrapping marketplace contract instance.

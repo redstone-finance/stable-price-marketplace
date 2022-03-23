@@ -22,7 +22,6 @@ export default function App() {
 
   async function updateOrders() {
     const orders = await blockchain.getAllOrders();
-    console.log({orders});
     setOrders(orders);
   }
 
@@ -49,7 +48,9 @@ export default function App() {
   }
 
   async function buyButtonClicked(orderId) {
-    alert(`Buy button clicked`);
+    await blockchain.buy(orderId);
+    await updateOrders();
+    await updateOwnedNfts();
   }
 
   async function cancelButtonClicked(orderId) {

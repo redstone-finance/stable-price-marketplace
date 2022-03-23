@@ -8,7 +8,7 @@ export default function Card(props) {
         </div>
       </div>
 
-      <div class="price">
+      <div className="price">
         {props.price ? `$${props.price}` : ``}
       </div>
       
