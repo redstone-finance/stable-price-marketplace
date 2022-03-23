@@ -1,4 +1,4 @@
-// import { WrapperBuilder } from "redstone-evm-connector";
+import { WrapperBuilder } from "redstone-evm-connector";
 import { ethers } from "ethers";
 import fujiAddresses from "./config/fuji-addresses.json";
 import hardhatAddresses from "./config/local-addresses.json";

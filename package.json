@@ -11,7 +11,7 @@
     "app:eject": "react-scripts eject",
     "test": "hardhat test",
     "run-local-node": "hardhat node",
-    "deploy-contracts:local": "hardhat run --network local scripts/deploy-contracts.js",
+    "deploy-contracts:local": "hardhat run --network hardhat scripts/deploy-contracts.js",
     "deploy-contracts:fuji": "hardhat run --network fuji scripts/deploy-contracts.js"
   },
   "devDependencies": {
@@ -25,15 +25,13 @@
   },
   "dependencies": {
     "assert": "^2.0.0",
-    "node-polyfill-webpack-plugin": "^1.1.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-scripts": "^5.0.0",
-    "redstone-evm-connector": "^2.1.8",
+    "react-scripts": "4.0.3",
+    "redstone-evm-connector": "2.1.9",
     "sass": "^1.49.9",
     "stream": "^0.0.2",
-    "stream-browserify": "^3.0.0",
-    "webpack": "^5.70.0"
+    "stream-browserify": "^3.0.0"
   },
   "browserslist": {
     "production": [
