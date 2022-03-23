@@ -1,48 +1,19 @@
 import { WrapperBuilder } from "redstone-evm-connector";
 import { ethers } from "ethers";
 import fujiAddresses from "./config/fuji-addresses.json";
-import hardhatAddresses from "./config/local-addresses.json";
+import localAddresses from "./config/local-addresses.json";
 import nftAbi from "./config/nft-abi.json";
-import marketplaceAbi from "./config/marketplace-api.json";
+import marketplaceAbi from "./config/marketplace-abi.json";
+
+const LOCAL_NETWORK_ID = 31337;
+const FUJI_NETWORK_ID = 43113;
 
 const ABIs = {
   nft: nftAbi,
   marketplace: marketplaceAbi,
 };
 
-// TODO: check connected network
-async function getContractAddress(contractName) {
-  const networkId = 1;
-  return networkId == 1
-    ? hardhatAddresses[contractName]
-    : fujiAddresses[contractName];
-}
-
-async function getSigner() {
-  await connectWallet();
-  const signer = (new ethers.providers.Web3Provider(window.ethereum)).getSigner();
-  return signer;
-}
-
-async function getContractInstance(contractName) {
-  const abi = ABIs[contractName];
-  const address = await getContractAddress(contractName);
-  const signer = await getSigner();
-  return new ethers.Contract(address, abi, signer);
-}
-
-async function connectWallet() {
-  await window.ethereum.request({ method: 'eth_requestAccounts' });
-}
-
-function onAddressChange(callback) {
-  ethereum.on("accountsChanged", callback);
-}
-
-async function getUserAddress() {
-  const signer = await getSigner();
-  return await signer.getAddress();
-}
+///////// NFT AND MARKETPLACE FUNCTIONS /////////
 
 async function getOwnedNfts(address) {
   const nft = await getContractInstance("nft");
@@ -122,6 +93,9 @@ async function buy(orderId) {
   return buyTx;
 }
 
+
+///////// STANDARD BLOCKCHAIN UTILS FUNCTIONS /////////
+
 function shortenAddress(address) {
   return address.slice(0, 7) + ".." + address.slice(address.length - 7);
 }
@@ -132,6 +106,56 @@ function bigBlockchainNumberToNumber(value) {
 
 function numberToBigBlockchainNumberString(value) {
   return ethers.utils.parseEther(String(value));
+}
+
+function onAddressChange(callback) {
+  ethereum.on("accountsChanged", callback);
+}
+
+async function getUserAddress() {
+  const signer = await getSigner();
+  return await signer.getAddress();
+}
+
+async function connectWallet() {
+  await window.ethereum.request({ method: 'eth_requestAccounts' });
+}
+
+async function getSigner() {
+  await connectWallet();
+  const signer = (new ethers.providers.Web3Provider(window.ethereum)).getSigner();
+  return signer;
+}
+
+async function getContractInstance(contractName) {
+  const abi = ABIs[contractName];
+  const address = await getContractAddress(contractName);
+  const signer = await getSigner();
+  return new ethers.Contract(address, abi, signer);
+}
+
+async function getContractAddress(contractName) {
+  const chainId = await getChainId();
+  return chainId == LOCAL_NETWORK_ID
+    ? localAddresses[contractName]
+    : fujiAddresses[contractName];
+}
+
+async function getChainId() {
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const network = await provider.getNetwork();
+
+  const chainId = network.chainId;
+
+  // Check if network is supported
+  if (![LOCAL_NETWORK_ID, FUJI_NETWORK_ID].includes(chainId)) {
+    const errText =
+      `Please connect to local network or to Avalanche FUJI testnet and reload the page`;
+    alert(errText);
+    throw new Error(errText);
+  }
+
+  return chainId;
 }
 
 export default {

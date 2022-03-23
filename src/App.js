@@ -4,9 +4,21 @@ import blockchain from "./blockchain";
 import "./styles.scss";
 
 export default function App() {
+  // App state
   const [address, setAddress] = useState(null);
   const [orders, setOrders] = useState([]);
   const [ownedNfts, setOwnedNfts] = useState([]);
+
+  // On page laod
+  useEffect(async () => {
+    await connectOrUpdateWallet();
+    updateOwnedNfts();
+    updateOrders();
+    blockchain.onAddressChange(async () => {
+      await connectOrUpdateWallet();
+      await updateOwnedNfts();
+    });
+  }, []);
 
   async function connectOrUpdateWallet() {
     await blockchain.connectWallet();
@@ -29,16 +41,6 @@ export default function App() {
     await blockchain.mintNft();
     await updateOwnedNfts();
   }
-
-  useEffect(async () => {
-    await connectOrUpdateWallet();
-    updateOwnedNfts();
-    updateOrders();
-    blockchain.onAddressChange(async () => {
-      await connectOrUpdateWallet();
-      await updateOwnedNfts();
-    });
-  }, []);
 
   async function sellButtonClicked(tokenId) {
     const usdPrice = Number(prompt(`Please enter USD price for your NFT #${tokenId}`));
@@ -75,7 +77,11 @@ export default function App() {
 
   return (
     <div className="App">
+
+      {/* MAIN VIEW */}
       <div id="main-content" className="card-with-shadow">
+
+        {/* MY TOKENS (LEFT SIDE) */}
         <div id="nft-secion">
           <h2>My tokens</h2>
           <div className="cards-container">
@@ -94,6 +100,8 @@ export default function App() {
             </a>
           </div>
         </div>
+
+        {/* ORDERS (RIGHT SIDE) */}
         <div id="orders-section">
           <h2>Orders</h2>
           <div className="cards-container">
@@ -115,10 +123,12 @@ export default function App() {
         </div>
       </div>
 
+      {/* LOGO */}
       <div id="logo">
         Stable marketplace
       </div>
 
+      {/* WALLET SELECTOR */}
       <div id="wallet-connector">
         {address
           ? (blockchain.shortenAddress(address))
@@ -126,6 +136,7 @@ export default function App() {
         }
       </div>
 
+      {/* POWERED BY REDSTONE MARK */}
       <div id="powered-by-redstone">
         Powered by
         <a href="https://redstone.finance">

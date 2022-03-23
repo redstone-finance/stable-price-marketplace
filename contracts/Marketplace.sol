@@ -52,7 +52,7 @@ contract Marketplace {
         // Only order creator can cancel the order
         require(order.creator == msg.sender);
 
-        // Transfer NFT back to user
+        // Transfer NFT back to order creator
         IERC721 nftContract = IERC721(order.nftContractAddress);
         nftContract.transferFrom(address(this), msg.sender, order.tokenId);
 
@@ -69,7 +69,7 @@ contract Marketplace {
         uint256 expectedAvaxAmount = _getPriceFromOrder(order);
         require(expectedAvaxAmount <= msg.value);
 
-        // Transfer NFT
+        // Transfer NFT to buyer
         IERC721 nftContract = IERC721(order.nftContractAddress);
         nftContract.transferFrom(address(this), msg.sender, order.tokenId);
 

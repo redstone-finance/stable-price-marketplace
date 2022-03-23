@@ -30,14 +30,18 @@ contract StableMarketplace is Marketplace, PriceAware {
         return (order.price / getPriceFromMsg(bytes32("AVAX"))) * (10**8);
     }
 
-    // Optional function for data package timestamp validation
+    // [OPTIONAL] function for data package timestamp validation
     function isTimestampValid(uint256 _receivedTimestamp)
         public
         pure
         override
         returns (bool)
     {
-        _receivedTimestamp;
+        _receivedTimestamp; // added to avoid warnings with an unused arg
+
+        // We return true to avoid problems with local hardhat network.
+        // It's strongly recommended to have the real time validation
+        // in production dApps
         return true;
     }
 }

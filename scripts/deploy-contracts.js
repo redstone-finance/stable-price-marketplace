@@ -5,7 +5,7 @@ async function main() {
   const nftContract = await deployContract("ExampleNFT");
   const marketplaceContract = await deployContract("StableMarketplace");
 
-  // Update some JSON file
+  // Update JSON file with addresses
   updateAddressesFile({
     nft: nftContract.address,
     marketplace: marketplaceContract.address,
@@ -22,7 +22,6 @@ async function deployContract(name, ...args) {
   return deployedContract;
 }
 
-// for local env and for fuji testnet
 function updateAddressesFile(addresses) {
   const addressesFilePath = `./src/config/${hre.network.name}-addresses.json`;
   console.log(`Saving addresses to ${addressesFilePath}`);
