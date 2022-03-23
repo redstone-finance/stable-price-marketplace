@@ -1,6 +1,6 @@
 export default function Card(props) {
   return (
-    <div className="card nft-card increase-on-hover">
+    <div className="card nft-card card-with-shadow increase-on-hover">
       <div className="left">
         <img className="nft-icon" src={props.image} />
         <div className="nft-token-id">

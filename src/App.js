@@ -33,28 +33,6 @@ export default function App() {
 
   return (
     <div className="App">
-
-      <div id="logo" class="card-with-shadow">
-        <img
-          src="img/redstone-logo.png"
-          alt="redstone-logo"
-          width="160"
-        />
-        <br />
-        Stable marketplace
-      </div>
-
-      <div id="wallet-connector" class="card-with-shadow">
-        {address
-          ? (address)
-          : (
-              <a className="button" href="#" onClick={() => alert('hehe')}>
-                Connect wallet
-              </a>
-            )
-        }
-      </div>
-
       <div id="main-content" class="card-with-shadow">
         <div id="nft-secion">
           <h2>My tokens</h2>
@@ -81,6 +59,31 @@ export default function App() {
             ))}
           </div>
         </div>
+      </div>
+
+      <div id="logo" class="card-with-shadow">
+        Stable marketplace
+      </div>
+
+      <div id="wallet-connector" class="card-with-shadow">
+        {address
+          ? (address)
+          : (<a className="button" href="#" onClick={() => alert('hehe')}>Connect wallet</a>)
+        }
+      </div>
+
+      <div id="powered-by-redstone">
+        <div>
+          
+        </div>
+        Powered by
+        <a href="https://redstone.finance">
+          <img
+            src="img/redstone-logo.png"
+            alt="redstone-logo"
+            width="100"
+          />
+        </a>
       </div>
     </div>
   );

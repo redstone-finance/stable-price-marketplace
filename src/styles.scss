@@ -4,15 +4,22 @@
   color: #333;
 
   #logo {
-    position: absolute;
+    position: fixed;
     top: 30px;
     left: 30px;
-    font-size: 14px;
-    color: black;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 14px 20px;
+    color: #3e80c8;
   }
 
   .card-with-shadow {
-    box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+    // Blue version
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(164, 201, 250, 0.4) 0px 0px 0px 4px;
+
+
+    // box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+
     padding: 14px;
     border-radius: 25px;
   }
@@ -25,10 +32,35 @@
   }
 
   #wallet-connector {
-    position: absolute;
-    top: 25px;
+    position: fixed;
+    top: 30px;
     right: 30px;
     padding: 14px 20px;
+    color: #3e80c8;
+    a {
+      color: #3e80c8;
+    }
+  }
+
+  #powered-by-redstone {
+    position: fixed;
+
+    // Near logo
+    // top: 90px;
+    // left: 48px;
+
+    // Bottom left
+    bottom: 30px;
+    left: 30px;
+    
+    font-size: 12px;
+    // text-align: left;
+
+    img {
+      position: relative;
+      top: 5px;
+      left: 4px;
+    }
   }
 
   #main-content {
@@ -58,7 +90,7 @@
         // border: 1px solid gray;
         box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
         // border-radius: 12px;
-        border-radius: 20px;
+        // border-radius: 20px;
         margin: 8px;
         margin-bottom: 10px;
         display: flex;
@@ -90,10 +122,6 @@
         align-items: center;
       }
     }
-
-    #orders-section {
-      // font-size: 10px;
-    }
   }
 
   a.button {
@@ -102,8 +130,6 @@
   }
   
   a.button:hover {  
-    // transform: scale(2);
-    // text-decoration: underline;
     font-weight: 500;
   }
 }
