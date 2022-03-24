@@ -1,15 +1,171 @@
-# Stable price NFT marketplace (powered by RedStone oracles)
+# Stable price NFT marketplace
 
-This is an example implementation of a dApp - NFT marketplace with stable price.
-TODO: add much more about the idea
+This is an example implementation of a dApp that uses [RedStone oracles.](https://redstone.finance/)
 
+The repo contains an implementation of an NFT marketplace dApp with so-called "stable" price. It means that sellers can create sell orders (offers), specifying price amount in USD. But buyers are able to pay with native coins, required amount of which is calculated dynamically in the moment of the order execution.
 
-## How to use the app
+## 🙋‍♂️ Need help?
+Please feel free to contact the RedStone team [on Discord](https://redstone.finance/discord) if you have any questions.
+
+## 🧑‍💻 Implementation
+
+We use [hardhat](https://hardhat.org/) and [ethers.js](https://docs.ethers.io/v5/) for deployment scripts and contract tests and [React](https://reactjs.org/) for frontend imlpementation.
+
+### Code structure
+
+```bash
+.
+├── contracts                   # Solidity contracts
+│   ├── ExampleNFT.sol          # Example ERC721 contract
+│   ├── Marketplace.sol         # Simple NFT marketplace contract
+│   ├── StableMarketplace.sol   # NFT marketplace contract with stable price
+│   └── ...
+├── public                      # Folder with public html files and images for React app
+├── scripts                     # Contract deployment scripts
+├── src                         # React app source code
+│   ├── App.js                  # Main React component
+│   ├── blockchain.js           # JS module responsible for interaction with blockchain and contracts
+│   ├── config/                 # Folder with contract ABIs and deployed contract addresses
+│   └── ...
+├── test                        # Contract tests
+└── ...
+```
+
+### Contracts
+
+#### ExampleNFT.sol
+
+`ExampleNFT` is a simple ERC721 contract with automated sequential token id assignment
+
+```js
+function mint() external {
+    _mint(msg.sender, nextTokenId);
+    nextTokenId++;
+}
+```
+
+This contract extends `ERC721Enumerable` implementation created by the `@openzeppelin` team, which adds view functions for listing all tokens and tokens owned by a user.
+
+#### Marketplace.sol
+
+`Marketplace` is an NFT marketplace contract, which allows to post sell orders for any NFT token that follows [EIP-721 non-fungible token standard](https://eips.ethereum.org/EIPS/eip-721). It has the following functions:
+
+```js
+
+// Created a new sell order
+// This function requires approval for transfer on the specified NFT token
+function postSellOrder(address nftContractAddress, uint256 tokenId, uint256 price) external {}
+
+// Only order creator can call this function
+function cancelOrder(uint256 orderId) external {}
+
+// Allows to get info about all orders (including canceled, and executed ones)
+function getAllOrders() public view returns (SellOrder[] memory) {}
+
+// Returns expected price in AVAX tokens for a given order
+function getPrice(uint256 orderId) public view returns (uint256) {}
+
+// Requires sending at least minimal expected AVAX tokens
+function buy(uint256 orderId) external payable {}
+
+```
+
+The implementation is quite straightforward, so we won't describe it here. You can check the full contract code in the [contracts/Marketplace.sol.](contracts/Marketplace.sol)
+
+#### StableMarketplace.sol
+
+`StableMarketplace` is the marketplace contract with the stable price support. It extends the `Marketplace.sol` implementation and only overrides its `_getPriceFromOrder` function.
+
+```js
+// `_getPriceFromOrder` function uses the `getPriceFromMsg` function,
+// which fetches signed data from tx calldata and verifies its signature
+function _getPriceFromOrder(SellOrder memory order)
+    internal
+    view
+    override
+    returns (uint256)
+{
+    return (order.price / getPriceFromMsg(bytes32("AVAX"))) * (10**8);
+}
+```
+
+For being able to use RedStone data, the contract extends the `PriceAware.sol` redstone contract.
+
+```js
+import "redstone-evm-connector/lib/contracts/message-based/PriceAware.sol";
+import "./Marketplace.sol";
+
+contract StableMarketplace is Marketplace, PriceAware {
+    ...
+}
+```
+
+It also overrides the `isSignerAuthorised` function from `PriceAware.sol` contract and specifies trusted data signer address.
+
+```js
+// You can check addresses for authorized redstone signers at:
+// https://github.com/redstone-finance/redstone-evm-connector/blob/master/README.md#1-modifying-your-contracts
+function isSignerAuthorized(address _signer)
+    public
+    pure
+    override
+    returns (bool)
+{
+    return _signer == 0x0C39486f770B26F5527BBBf942726537986Cd7eb;
+}
+```
+
+### Frontend
+
+You can check the code of the React app in the `src` folder. We tried to simplify it as much as possible and leave only the core marketplace functions.
+
+The main UI logic is located in the `App.js` file, and the contract interaction logic is in the `blockchain.js` file.
+
+If you take a look into the `blockchain.js` file code, you'll notice that each contract call that needs to process RedStone data is made on a contract instance, that was wrapped by [redstone-evm-connector](https://www.npmjs.com/package/redstone-evm-connector).
+
+```js
+import { WrapperBuilder } from "redstone-evm-connector";
+
+async function getContractInstance(contractName) {
+  ...
+  return new ethers.Contract(address, abi, signer);
+}
+
+async function buy(orderId) {
+  const marketplace = await getContractInstance("marketplace");
+
+  // Wrapping marketplace contract instance.
+  // It enables fetching data from redstone data pool
+  // for each contract function call
+  const wrappedMarketplaceContract = WrapperBuilder
+    .wrapLite(marketplace)
+    .usingPriceFeed("redstone", { asset: "AVAX" });
+
+  // Checking expected amount
+  const expectedAvaxAmount = await wrappedMarketplaceContract.getPrice(orderId);
+
+  ...
+}
+```
+
+You can read much more about contract wrapping and `redstone-evm-connector` [here.](https://www.npmjs.com/package/redstone-evm-connector)
+
+### Tests
+
+We've used hardhat test framework to contract tests. All the tests are lcoated in the [test](test/) folder.
+
+💡 Note that each contract function that needs RedStone oracle data is also called on a wrapped ethers contract instance.
+
+```js
+const expectedAvaxAmount = await wrappedMarketplaceContract.getPrice(orderId);
+```
+
+## 🔥 How to use the app
 
 ### Deployed version
 The app is already deployed on Avalanche FUJI testnet. You can check it at: https://stable-marketplace.redstone.finance/
 
-### Build the app
+### Build the app locally
 You can also clone this repo and build the app locally. Please follow the steps below:
 
 #### 1. Clone this repo
@@ -78,90 +234,3 @@ You can also switch metamask account and buy the NFT. I would recommend to open 
 You should see at least 2 requests with the AVAX price data and crypto signatures. This data along with signatures is being attached for each contract call, that wants to process redstone oracle data.
 
 <img alt="redstone-requests" src="docs/img/redstone-requests.png" width="800" />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- 
-## Tutorial
-
-### 1. Init solidity project
-```sh
-yarn init
-yarn add hardhat --dev
-npx harhat
-```
-
-### 2. Implement NFT and marketplace contracts
-#### Install openzeppelin module
-TODO: describe shortly what is openzeppelin
-```sh
-yarn add @openzeppelin/contracts --dev
-```
-
-#### Add an example NFT contract
-```js
-// File: contracts/ExampleNFT.sol
-
-// SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.0;
-
-import "hardhat/console.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-
-contract ExampleNFT is ERC721 {
-    constructor() ERC721("ExampleNFT", "ENFT") {}
-}
-```
-
-#### Implement marketplace contract
-```js
-```
-
-### 3. Create tests
-TODO
-
-### 4. Connect redstone oracles
-#### Install `redstone-evm-connector`
-TODO: add description
-```sh
-yarn add redstone-evm-connector
-```
-
-#### Update contracts code
-TODO: decribe
-
-#### Update JS code
-TODO: decribe
-
-
-
-## Harhat tasks
-
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
-``` -->
