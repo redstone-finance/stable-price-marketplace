@@ -62,10 +62,10 @@ function cancelOrder(uint256 orderId) external {}
 // Allows to get info about all orders (including canceled, and executed ones)
 function getAllOrders() public view returns (SellOrder[] memory) {}
 
-// Returns expected price in CELO tokens for a given order
+// Returns expected price in AVAX tokens for a given order
 function getPrice(uint256 orderId) public view returns (uint256) {}
 
-// Requires sending at least minimal expected CELO tokens
+// Requires sending at least minimal expected AVAX tokens
 function buy(uint256 orderId) external payable {}
 
 ```
@@ -85,7 +85,7 @@ function _getPriceFromOrder(SellOrder memory order)
     override
     returns (uint256)
 {
-    return (order.price / getPriceFromMsg(bytes32("CELO"))) * (10**8);
+    return (order.price / getPriceFromMsg(bytes32("AVAX"))) * (10**8);
 }
 ```
 
@@ -139,10 +139,10 @@ async function buy(orderId) {
   // for each contract function call
   const wrappedMarketplaceContract = WrapperBuilder
     .wrapLite(marketplace)
-    .usingPriceFeed("redstone", { asset: "CELO" });
+    .usingPriceFeed("redstone", { asset: "AVAX" });
 
   // Checking expected amount
-  const expectedCeloAmount = await wrappedMarketplaceContract.getPrice(orderId);
+  const expectedAvaxAmount = await wrappedMarketplaceContract.getPrice(orderId);
 
   ...
 }
@@ -157,13 +157,13 @@ We've used hardhat test framework to contract tests. All the tests are lcoated i
 💡 Note that each contract function that needs RedStone oracle data is also called on a wrapped ethers contract instance.
 
 ```js
-const expectedCeloAmount = await wrappedMarketplaceContract.getPrice(orderId);
+const expectedAvaxAmount = await wrappedMarketplaceContract.getPrice(orderId);
 ```
 
 ## 🔥 How to use the app
 
 ### Deployed version
-The app is already deployed on CELO Alfajores testnet. You can check it at: https://celo-stable-marketplace.redstone.finance/
+The app is already deployed on Avalanche FUJI testnet. You can check it at: https://stable-marketplace.redstone.finance/
 
 ### Build the app locally
 You can also clone this repo and build the app locally. Please follow the steps below:
@@ -204,7 +204,7 @@ Select `Networks dropdown` -> `Add network` and enter the following details:
 :-----:|:-----:
 New RPC URL|http://localhost:8545
 Chain ID|31337
-Currency Symbol|CELO
+Currency Symbol|AVAX
 
 Then hit the `Save` button.
 
@@ -231,6 +231,6 @@ Once you mint any NFTs, you can post sell order for each one of them. Click the 
 ##### Buy NFTs
 You can also switch metamask account and buy the NFT. I would recommend to open the developer tools in browser at the network tab and explore network requests that are being sent before the buy transaction sending.
 
-You should see at least 2 requests with the CELO price data and crypto signatures. This data along with signatures is being attached for each contract call, that wants to process redstone oracle data.
+You should see at least 2 requests with the AVAX price data and crypto signatures. This data along with signatures is being attached for each contract call, that wants to process redstone oracle data.
 
 <img alt="redstone-requests" src="docs/img/redstone-requests.png" width="800" />

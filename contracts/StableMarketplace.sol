@@ -27,7 +27,7 @@ contract StableMarketplace is Marketplace, PriceAware {
         override
         returns (uint256)
     {
-        return (order.price / getPriceFromMsg(bytes32("CELO"))) * (10 ** 8);
+        return (order.price / getPriceFromMsg(bytes32("AVAX"))) * (10**8);
     }
 
     // [OPTIONAL] function for data package timestamp validation
