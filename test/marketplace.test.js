@@ -40,11 +40,11 @@ describe("Marketplace core functions test", function () {
     await approveTx.wait();
 
     // Post sell order
-    const avaxPrice = ethers.utils.parseEther("1");
+    const celoPrice = ethers.utils.parseEther("1");
     const postOrderTx = await marketplaceContract.postSellOrder(
       nftContractAddress,
       tokenId,
-      avaxPrice
+      celoPrice
     );
     await postOrderTx.wait();
 
@@ -61,25 +61,25 @@ describe("Marketplace core functions test", function () {
   it("Buying should fail with smaller amount then seller requested", async function () {
     const orderId = 0;
 
-    // Get expected avax amount
-    const expectedAvaxAmount = await marketplaceContract.getPrice(orderId);
-    logExpectedAmount(expectedAvaxAmount);
+    // Get expected CELO amount
+    const expectedCeloAmount = await marketplaceContract.getPrice(orderId);
+    logExpectedAmount(expectedCeloAmount);
 
     await expect(marketplaceContract.connect(buyer).buy(orderId, {
-      value: expectedAvaxAmount.mul(99).div(100), // We reduce the value by 1%
+      value: expectedCeloAmount.mul(99).div(100), // We reduce the value by 1%
     })).to.be.reverted;
   });
 
-  it("Buyer should buy token 1 for AVAX price", async function () {
+  it("Buyer should buy token 1 for CELO price", async function () {
     const orderId = 0;
 
-    // Get expected AVAX amount
-    const expectedAvaxAmount = await marketplaceContract.getPrice(orderId);
-    logExpectedAmount(expectedAvaxAmount);
+    // Get expected CELO amount
+    const expectedCeloAmount = await marketplaceContract.getPrice(orderId);
+    logExpectedAmount(expectedCeloAmount);
 
     // Send buy tx from buyer's wallet
     const buyTx = await marketplaceContract.connect(buyer).buy(orderId, {
-      value: expectedAvaxAmount.mul(101).div(100), // a buffer for price movements
+      value: expectedCeloAmount.mul(101).div(100), // a buffer for price movements
     });
     await buyTx.wait();
 
@@ -95,11 +95,11 @@ describe("Marketplace core functions test", function () {
     await approveTx.wait();
 
     // Post sell order
-    const avaxPrice = ethers.utils.parseEther("1");
+    const celoPrice = ethers.utils.parseEther("1");
     const postOrderTx = await marketplaceContract.connect(buyer).postSellOrder(
       nftContractAddress,
       tokenId,
-      avaxPrice
+      celoPrice
     );
     await postOrderTx.wait();
 
@@ -111,5 +111,5 @@ describe("Marketplace core functions test", function () {
 });
 
 function logExpectedAmount(amount) {
-  console.log(`Expected AVAX amount: ${ethers.utils.formatEther(amount.toString())}`);
+  console.log(`Expected CELO amount: ${ethers.utils.formatEther(amount.toString())}`);
 }

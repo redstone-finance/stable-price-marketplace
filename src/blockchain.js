@@ -79,14 +79,14 @@ async function buy(orderId) {
   // for each contract function call
   const wrappedMarketplaceContract = WrapperBuilder
     .wrapLite(marketplace)
-    .usingPriceFeed("redstone", { asset: "AVAX" });
+    .usingPriceFeed("redstone", { asset: "CELO" });
 
   // Checking expected amount
-  const expectedAvaxAmount = await wrappedMarketplaceContract.getPrice(orderId);
+  const expectedCeloAmount = await wrappedMarketplaceContract.getPrice(orderId);
 
   // Sending buy tx
   const buyTx = await wrappedMarketplaceContract.buy(orderId, {
-    value: expectedAvaxAmount.mul(101).div(100) // a buffer for price movements
+    value: expectedCeloAmount.mul(101).div(100) // a buffer for price movements
   });
   await buyTx.wait();
 

@@ -57,32 +57,32 @@ describe("Marketplace core functions test", function () {
   it("Should wrap marketplace contract with redstone wrapper", async function () {
     wrappedMarketplaceContract = WrapperBuilder
       .wrapLite(marketplaceContract.connect(buyer))
-      .usingPriceFeed("redstone", { asset: "AVAX" });
+      .usingPriceFeed("redstone", { asset: "CELO" });
   });
 
   it("Buying should fail with smaller amount then seller requested", async function () {
     const orderId = 0;
 
     // Get expected ether amount
-    const expectedAvaxAmount = await wrappedMarketplaceContract.getPrice(orderId);
-    logExpectedAmount(expectedAvaxAmount);
+    const expectedCeloAmount = await wrappedMarketplaceContract.getPrice(orderId);
+    logExpectedAmount(expectedCeloAmount);
 
     // Trying to buy (should fail)
     await expect(wrappedMarketplaceContract.buy(orderId, {
-      value: expectedAvaxAmount.mul(99).div(100)
+      value: expectedCeloAmount.mul(99).div(100)
     })).to.be.reverted;
   });
 
-  it("Buyer should buy token for USD price expressed in AVAX", async function () {
+  it("Buyer should buy token for USD price expressed in CELO", async function () {
     const orderId = 0;
 
     // Get expected ether amount
-    const expectedAvaxAmount = await wrappedMarketplaceContract.getPrice(orderId);
-    logExpectedAmount(expectedAvaxAmount);
+    const expectedCeloAmount = await wrappedMarketplaceContract.getPrice(orderId);
+    logExpectedAmount(expectedCeloAmount);
 
     // Send buy tx from user 2 wallet
     const buyTx = await wrappedMarketplaceContract.buy(orderId, {
-      value: expectedAvaxAmount.mul(101).div(100) // a buffer for price movements
+      value: expectedCeloAmount.mul(101).div(100) // a buffer for price movements
     });
     await buyTx.wait();
 
@@ -92,5 +92,5 @@ describe("Marketplace core functions test", function () {
 });
 
 function logExpectedAmount(amount) {
-  console.log(`Expected AVAX amount: ${ethers.utils.formatEther(amount.toString())}`);
+  console.log(`Expected CELO amount: ${ethers.utils.formatEther(amount.toString())}`);
 }

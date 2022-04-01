@@ -30,10 +30,10 @@ module.exports = {
       url: "http://localhost:8545",
       chainId: 31337,
     },
-    fuji: {
-      url: "https://api.avax-test.network/ext/bc/C/rpc",
+    alfajores: {
+      url: "https://alfajores-forno.celo-testnet.org",
       gasPrice: 225000000000,
-      chainId: 43113,
+      chainId: 44787,
       accounts: tryGetPrivateKeys()
     }
   }

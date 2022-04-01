@@ -66,8 +66,8 @@ contract Marketplace {
         require(order.status == OrderStatus.ACTIVE);
 
         // Check transfered ETH value
-        uint256 expectedAvaxAmount = _getPriceFromOrder(order);
-        require(expectedAvaxAmount <= msg.value);
+        uint256 expectedCeloAmount = _getPriceFromOrder(order);
+        require(expectedCeloAmount <= msg.value);
 
         // Transfer NFT to buyer
         IERC721 nftContract = IERC721(order.nftContractAddress);
