@@ -163,7 +163,7 @@ const expectedCeloAmount = await wrappedMarketplaceContract.getPrice(orderId);
 ## 🔥 How to use the app
 
 ### Deployed version
-The app is already deployed on Avalanche FUJI testnet. You can check it at: https://stable-marketplace.redstone.finance/
+The app is already deployed on CELO Alfajores testnet. You can check it at: https://celo-stable-marketplace.redstone.finance/
 
 ### Build the app locally
 You can also clone this repo and build the app locally. Please follow the steps below:

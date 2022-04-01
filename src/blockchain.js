@@ -1,12 +1,12 @@
 import { WrapperBuilder } from "redstone-evm-connector";
 import { ethers } from "ethers";
-import fujiAddresses from "./config/fuji-addresses.json";
+import alfajoresAddresses from "./config/alfajores-addresses.json";
 import localAddresses from "./config/local-addresses.json";
 import nftAbi from "./config/nft-abi.json";
 import marketplaceAbi from "./config/marketplace-abi.json";
 
 const LOCAL_NETWORK_ID = 31337;
-const FUJI_NETWORK_ID = 43113;
+const ALFAJORES_NETWORK_ID = 44787;
 
 const ABIs = {
   nft: nftAbi,
@@ -138,7 +138,7 @@ async function getContractAddress(contractName) {
   const chainId = await getChainId();
   return chainId == LOCAL_NETWORK_ID
     ? localAddresses[contractName]
-    : fujiAddresses[contractName];
+    : alfajoresAddresses[contractName];
 }
 
 async function getChainId() {
@@ -148,9 +148,9 @@ async function getChainId() {
   const chainId = network.chainId;
 
   // Check if network is supported
-  if (![LOCAL_NETWORK_ID, FUJI_NETWORK_ID].includes(chainId)) {
+  if (![LOCAL_NETWORK_ID, ALFAJORES_NETWORK_ID].includes(chainId)) {
     const errText =
-      `Please connect to local network or to Avalanche FUJI testnet and reload the page`;
+      `Please connect to local network or to CELO Alfajores testnet and reload the page`;
     alert(errText);
     throw new Error(errText);
   }

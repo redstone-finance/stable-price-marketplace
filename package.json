@@ -12,7 +12,7 @@
     "test": "hardhat test",
     "run-local-node": "hardhat node",
     "deploy-contracts:local": "hardhat run --network local scripts/deploy-contracts.js",
-    "deploy-contracts:fuji": "hardhat run --network fuji scripts/deploy-contracts.js"
+    "deploy-contracts:alfajores": "hardhat run --network alfajores scripts/deploy-contracts.js"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",
