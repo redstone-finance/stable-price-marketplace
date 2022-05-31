@@ -62,10 +62,10 @@ function cancelOrder(uint256 orderId) external {}
 // Allows to get info about all orders (including canceled, and executed ones)
 function getAllOrders() public view returns (SellOrder[] memory) {}
 
-// Returns expected price in ETH for the given order
+// Returns expected price in AVAX for the given order
 function getPrice(uint256 orderId) public view returns (uint256) {}
 
-// Requires sending at least the minimal amount of ETH
+// Requires sending at least the minimal amount of AVAX
 function buy(uint256 orderId) external payable {}
 
 ```
@@ -81,7 +81,7 @@ The implementation is quite straightforward, so we won't describe it here. You c
 // which fetches signed data from tx calldata and verifies its signature
 function _getPriceFromOrder(SellOrder memory order) internal view override returns (uint256)
 {
-    return (order.price / getPriceFromMsg(bytes32("ETH"))) * (10**8);
+    return (order.price / getPriceFromMsg(bytes32("AVAX"))) * (10**8);
 }
 ```
 
@@ -130,7 +130,7 @@ async function buy(orderId) {
   // It enables fetching data from redstone data pool
   // for each contract function call
   const wrappedMarketplaceContract = WrapperBuilder.wrapLite(marketplace)
-    .usingPriceFeed("redstone", { asset: "ETH" });
+    .usingPriceFeed("redstone", { asset: "AVAX" });
 
   // Checking expected amount
   const expectedAvaxAmount = await wrappedMarketplaceContract.getPrice(orderId);
@@ -195,7 +195,7 @@ Select `Networks dropdown` -> `Add network` and enter the following details:
 :-----:|:-----:
 New RPC URL|http://localhost:8545
 Chain ID|31337
-Currency Symbol|ETH
+Currency Symbol|AVAX
 
 Then hit the `Save` button.
 
