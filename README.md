@@ -79,11 +79,7 @@ The implementation is quite straightforward, so we won't describe it here. You c
 ```js
 // `_getPriceFromOrder` function uses the `getPriceFromMsg` function,
 // which fetches signed data from tx calldata and verifies its signature
-function _getPriceFromOrder(SellOrder memory order)
-    internal
-    view
-    override
-    returns (uint256)
+function _getPriceFromOrder(SellOrder memory order) internal view override returns (uint256)
 {
     return (order.price / getPriceFromMsg(bytes32("ETH"))) * (10**8);
 }
@@ -105,11 +101,7 @@ It also overrides the `isSignerAuthorised` function from `PriceAware.sol` contra
 ```js
 // You can check addresses for authorized redstone signers at:
 // https://github.com/redstone-finance/redstone-evm-connector/blob/master/README.md#1-modifying-your-contracts
-function isSignerAuthorized(address _signer)
-    public
-    pure
-    override
-    returns (bool)
+function isSignerAuthorized(address _signer) public pure override returns (bool)
 {
     return _signer == 0x0C39486f770B26F5527BBBf942726537986Cd7eb;
 }
@@ -137,8 +129,7 @@ async function buy(orderId) {
   // Wrapping marketplace contract instance.
   // It enables fetching data from redstone data pool
   // for each contract function call
-  const wrappedMarketplaceContract = WrapperBuilder
-    .wrapLite(marketplace)
+  const wrappedMarketplaceContract = WrapperBuilder.wrapLite(marketplace)
     .usingPriceFeed("redstone", { asset: "ETH" });
 
   // Checking expected amount
