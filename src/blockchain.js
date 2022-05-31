@@ -79,7 +79,7 @@ async function buy(orderId) {
   // for each contract function call
   const wrappedMarketplaceContract = WrapperBuilder
     .wrapLite(marketplace)
-    .usingPriceFeed("redstone", { asset: "AVAX" });
+    .usingPriceFeed("redstone-avalanche-prod", { asset: "AVAX" });
 
   // Checking expected amount
   const expectedAvaxAmount = await wrappedMarketplaceContract.getPrice(orderId);
