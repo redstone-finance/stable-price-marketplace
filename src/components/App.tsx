@@ -1,23 +1,33 @@
 import { useState, useEffect } from "react";
-import Card from "./Card";
-import blockchain from "./blockchain";
-import "./styles.scss";
+import { Card } from "./Card";
+import blockchain from "../blockchain";
+import "../styles.scss";
+
+interface Order {
+  orderId: string;
+  tokenId: string;
+  usdPrice: string;
+  creator: string;
+}
 
 export default function App() {
   // App state
-  const [address, setAddress] = useState(null);
-  const [orders, setOrders] = useState([]);
-  const [ownedNfts, setOwnedNfts] = useState([]);
+  const [address, setAddress] = useState<string | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [ownedNfts, setOwnedNfts] = useState<string[]>([]);
 
   // On page laod
-  useEffect(async () => {
-    await connectOrUpdateWallet();
-    updateOwnedNfts();
-    updateOrders();
-    blockchain.onAddressChange(async () => {
+  useEffect(() => {
+    const onPageLoad = async () => {
       await connectOrUpdateWallet();
-      await updateOwnedNfts();
-    });
+      updateOwnedNfts();
+      updateOrders();
+      blockchain.onAddressChange(async () => {
+        await connectOrUpdateWallet();
+        await updateOwnedNfts();
+      });
+    };
+    onPageLoad().catch(console.error);
   }, []);
 
   async function connectOrUpdateWallet() {
@@ -29,7 +39,7 @@ export default function App() {
   async function updateOwnedNfts() {
     const address = await blockchain.getUserAddress();
     const tokenIds = await blockchain.getOwnedNfts(address);
-    setOwnedNfts(tokenIds.map(bn => bn.toNumber()));
+    setOwnedNfts(tokenIds.map((tokenId) => tokenId.toNumber()));
   }
 
   async function updateOrders() {
@@ -42,26 +52,28 @@ export default function App() {
     await updateOwnedNfts();
   }
 
-  async function sellButtonClicked(tokenId) {
-    const usdPrice = Number(prompt(`Please enter USD price for your NFT #${tokenId}`));
+  async function sellButtonClicked(tokenId: string) {
+    const usdPrice = Number(
+      prompt(`Please enter USD price for your NFT #${tokenId}`)
+    );
     await blockchain.postOrder({ tokenId, usdPrice });
     await updateOrders();
     await updateOwnedNfts();
   }
 
-  async function buyButtonClicked(orderId) {
+  async function buyButtonClicked(orderId: string) {
     await blockchain.buy(orderId);
     await updateOrders();
     await updateOwnedNfts();
   }
 
-  async function cancelButtonClicked(orderId) {
+  async function cancelButtonClicked(orderId: string) {
     await blockchain.cancelOrder(orderId);
     updateOrders();
     updateOwnedNfts();
   }
 
-  function getOrderButtonDetails(order) {
+  function getOrderButtonDetails(order: Order) {
     return order.creator === address
       ? {
           text: "CANCEL",
@@ -77,21 +89,20 @@ export default function App() {
 
   return (
     <div className="App">
-
       {/* MAIN VIEW */}
       <div id="main-content" className="card-with-shadow">
-
         {/* MY TOKENS (LEFT SIDE) */}
         <div id="nft-secion">
           <h2>My tokens</h2>
           <div className="cards-container">
-            {ownedNfts.map(tokenId => (
+            {ownedNfts.map((tokenId) => (
               <Card
                 key={tokenId}
                 tokenId={tokenId}
                 image="img/nft-icon.png"
                 buttonText="SELL"
                 onButtonClick={sellButtonClicked}
+                price={""}
               />
             ))}
 
@@ -105,7 +116,7 @@ export default function App() {
         <div id="orders-section">
           <h2>Orders</h2>
           <div className="cards-container">
-            {orders.map(order => {
+            {orders.map((order) => {
               const buttonDetails = getOrderButtonDetails(order);
               return (
                 <Card
@@ -124,27 +135,24 @@ export default function App() {
       </div>
 
       {/* LOGO */}
-      <div id="logo">
-        Stable marketplace
-      </div>
+      <div id="logo">Stable marketplace</div>
 
       {/* WALLET SELECTOR */}
       <div id="wallet-connector">
-        {address
-          ? (blockchain.shortenAddress(address))
-          : (<a className="button" href="#" onClick={blockchain.connectWallet}>Connect wallet</a>)
-        }
+        {address ? (
+          blockchain.shortenAddress(address)
+        ) : (
+          <a className="button" href="#" onClick={blockchain.connectWallet}>
+            Connect wallet
+          </a>
+        )}
       </div>
 
       {/* POWERED BY REDSTONE MARK */}
       <div id="powered-by-redstone">
         Powered by
         <a href="https://redstone.finance">
-          <img
-            src="img/redstone-logo.png"
-            alt="redstone-logo"
-            width="100"
-          />
+          <img src="img/redstone-logo.png" alt="redstone-logo" width="100" />
         </a>
       </div>
     </div>

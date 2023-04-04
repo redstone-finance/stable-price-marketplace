@@ -194,7 +194,7 @@ Select `Networks dropdown` -> `Add network` and enter the following details:
 **Network Name**|**hardhat-local**
 :-----:|:-----:
 New RPC URL|http://localhost:8545
-Chain ID|31337
+Chain ID|1337
 Currency Symbol|AVAX
 
 Then hit the `Save` button.
