@@ -9,12 +9,11 @@ Please feel free to contact the RedStone team [on Discord](https://redstone.fina
 
 ## 🧑‍💻 Implementation
 
-We use [hardhat](https://hardhat.org/) and [ethers.js](https://docs.ethers.io/v5/) for deployment scripts and contract tests and [React](https://reactjs.org/) for frontend imlpementation.
+We use [hardhat](https://hardhat.org/) and [ethers.js](https://docs.ethers.io/v5/) for deployment scripts and contract tests and [React](https://reactjs.org/) for frontend implementation.
 
 ### Code structure
 
 ```bash
-.
 ├── contracts                   # Solidity contracts
 │   ├── ExampleNFT.sol          # Example ERC721 contract
 │   ├── Marketplace.sol         # Simple NFT marketplace contract
@@ -23,8 +22,10 @@ We use [hardhat](https://hardhat.org/) and [ethers.js](https://docs.ethers.io/v5
 ├── public                      # Folder with public html files and images for React app
 ├── scripts                     # Contract deployment scripts
 ├── src                         # React app source code
-│   ├── App.js                  # Main React component
-│   ├── blockchain.js           # JS module responsible for interaction with blockchain and contracts
+│   ├── components
+│   │   ├── App.tsx             # Main React component
+│   ├── core
+│   │   ├── blockchain.ts       # JS module responsible for interaction with blockchain and contracts
 │   ├── config/                 # Folder with contract ABIs and deployed contract addresses
 │   └── ...
 ├── test                        # Contract tests
@@ -101,9 +102,9 @@ contract StableMarketplace is Marketplace, MainDemoConsumerBase {
 
 You can check the code of the React app in the `src` folder. We tried to simplify it as much as possible and leave only the core marketplace functions.
 
-The main UI logic is located in the `App.js` file, and the contract interaction logic is in the `blockchain.js` file.
+The main UI logic is located in the `App.tsx` file, and the contract interaction logic is in the `blockchain.ts` file.
 
-If you take a look into the `blockchain.js` file code, you'll notice that each contract call that needs to process RedStone data is made on a contract instance, that was wrapped by [redstone-evm-connector](https://www.npmjs.com/package/redstone-evm-connector).
+If you take a look into the `blockchain.ts` file code, you'll notice that each contract call that needs to process RedStone data is made on a contract instance, that was wrapped by [@redstone-finance/evm-connector](https://www.npmjs.com/package/@redstone-finance/evm-connector).
 
 ```js
 import { WrapperBuilder } from "@redstone-finance/evm-connector";
@@ -137,11 +138,11 @@ async function buy(orderId) {
 }
 ```
 
-You can read much more about contract wrapping and `redstone-evm-connector` [here.](https://www.npmjs.com/package/redstone-evm-connector)
+You can read much more about contract wrapping and `@redstone-finance/evm-connector` [here.](https://www.npmjs.com/package/@redstone-finance/evm-connector)
 
 ### Tests
 
-We've used hardhat test framework to contract tests. All the tests are lcoated in the [test](test/) folder.
+We've used hardhat test framework to contract tests. All the tests are located in the [test](test/) folder.
 
 💡 Note that each contract function that needs RedStone oracle data is also called on a wrapped ethers contract instance.
 

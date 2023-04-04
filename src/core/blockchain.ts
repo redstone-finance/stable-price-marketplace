@@ -1,9 +1,9 @@
 import { WrapperBuilder } from "@redstone-finance/evm-connector";
 import { ethers, utils } from "ethers";
-import fujiAddresses from "./config/fuji-addresses.json";
-import localAddresses from "./config/local-addresses.json";
-import nftAbi from "./config/nft-abi.json";
-import marketplaceAbi from "./config/marketplace-abi.json";
+import fujiAddresses from "../config/fuji-addresses.json";
+import localAddresses from "../config/local-addresses.json";
+import nftAbi from "../config/nft-abi.json";
+import marketplaceAbi from "../config/marketplace-abi.json";
 
 const LOCAL_NETWORK_ID = 1337;
 const FUJI_NETWORK_ID = 43113;

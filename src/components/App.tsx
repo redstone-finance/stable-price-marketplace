@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card } from "./Card";
-import blockchain from "../blockchain";
+import blockchain from "../core/blockchain";
 import "../styles.scss";
 
 interface Order {
