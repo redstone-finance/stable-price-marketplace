@@ -1,8 +1,9 @@
-const { expect } = require("chai");
-const { ethers } = require("hardhat");
+import { expect } from "chai";
+import { ethers } from "hardhat";
+import { ExampleNFT } from "../typechain-types";
 
 describe("ExampleNFT", function () {
-  let exampleNFTContract;
+  let exampleNFTContract: ExampleNFT;
 
   it("Should deploy ExampleNFT", async function () {
     const ExampleNFT = await ethers.getContractFactory("ExampleNFT");

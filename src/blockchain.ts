@@ -1,12 +1,25 @@
-import { WrapperBuilder } from "redstone-evm-connector";
-import { ethers } from "ethers";
+import { WrapperBuilder } from "@redstone-finance/evm-connector";
+import { ethers, utils } from "ethers";
 import fujiAddresses from "./config/fuji-addresses.json";
 import localAddresses from "./config/local-addresses.json";
 import nftAbi from "./config/nft-abi.json";
 import marketplaceAbi from "./config/marketplace-abi.json";
 
-const LOCAL_NETWORK_ID = 31337;
+const LOCAL_NETWORK_ID = 1337;
 const FUJI_NETWORK_ID = 43113;
+
+declare global {
+  interface Window {
+    ethereum: any;
+  }
+}
+
+interface OrdersFromContract {
+  tokenId: { toNumber: () => number };
+  price: number;
+  creator: string;
+  status: number;
+}
 
 const ABIs = {
   nft: nftAbi,
@@ -15,7 +28,7 @@ const ABIs = {
 
 ///////// NFT AND MARKETPLACE FUNCTIONS /////////
 
-async function getOwnedNfts(address) {
+async function getOwnedNfts(address: string) {
   const nft = await getContractInstance("nft");
   const nftCount = await nft.balanceOf(address);
   const tokenIds = [];
@@ -37,17 +50,23 @@ async function getAllOrders() {
   const marketplace = await getContractInstance("marketplace");
   const orders = await marketplace.getAllOrders();
   return orders
-    .map((order, index) => ({
+    .map((order: OrdersFromContract, index: number) => ({
       orderId: index,
       tokenId: order.tokenId.toNumber(),
-      usdPrice: bigBlockchainNumberToNumber(order.price),
+      usdPrice: utils.formatEther(order.price),
       creator: order.creator,
       status: order.status,
     }))
-    .filter(order => order.status === 0);
+    .filter((order: OrdersFromContract) => order.status === 0);
 }
 
-async function postOrder({ tokenId, usdPrice }) {
+async function postOrder({
+  tokenId,
+  usdPrice,
+}: {
+  tokenId: string;
+  usdPrice: number;
+}) {
   const marketplace = await getContractInstance("marketplace");
   const nftContract = await getContractInstance("nft");
 
@@ -59,57 +78,55 @@ async function postOrder({ tokenId, usdPrice }) {
   const postOrderTx = await marketplace.postSellOrder(
     nftContract.address,
     tokenId,
-    numberToBigBlockchainNumberString(usdPrice)
+    utils.parseEther(String(usdPrice))
   );
   await postOrderTx.wait();
 }
 
-async function cancelOrder(orderId) {
+async function cancelOrder(orderId: string) {
   const marketplace = await getContractInstance("marketplace");
   const cancelTx = await marketplace.cancelOrder(orderId);
   await cancelTx.wait();
   return cancelTx;
 }
 
-async function buy(orderId) {
+async function buy(orderId: string) {
   const marketplace = await getContractInstance("marketplace");
 
   // Wrapping marketplace contract instance.
   // It enables fetching data from redstone data pool
   // for each contract function call
-  const wrappedMarketplaceContract = WrapperBuilder
-    .wrapLite(marketplace)
-    .usingPriceFeed("redstone-avalanche-prod", { asset: "AVAX" });
+  const wrappedMarketplaceContract = WrapperBuilder.wrap(
+    marketplace
+  ).usingDataService(
+    {
+      dataServiceId: "redstone-main-demo",
+      uniqueSignersCount: 1,
+      dataFeeds: ["AVAX"],
+    },
+    ["https://d33trozg86ya9x.cloudfront.net"]
+  );
 
   // Checking expected amount
   const expectedAvaxAmount = await wrappedMarketplaceContract.getPrice(orderId);
 
   // Sending buy tx
   const buyTx = await wrappedMarketplaceContract.buy(orderId, {
-    value: expectedAvaxAmount.mul(101).div(100) // a buffer for price movements
+    value: expectedAvaxAmount.mul(101).div(100), // a buffer for price movements
   });
   await buyTx.wait();
 
   return buyTx;
 }
 
-
 ///////// STANDARD BLOCKCHAIN UTILS FUNCTIONS /////////
 
-function shortenAddress(address) {
+function shortenAddress(address: string) {
   return address.slice(0, 7) + ".." + address.slice(address.length - 7);
 }
 
-function bigBlockchainNumberToNumber(value) {
-  return ethers.utils.formatEther(value);
-}
-
-function numberToBigBlockchainNumberString(value) {
-  return ethers.utils.parseEther(String(value));
-}
-
-function onAddressChange(callback) {
-  ethereum.on("accountsChanged", callback);
+function onAddressChange(callback: () => void) {
+  window.ethereum.on("accountsChanged", callback);
 }
 
 async function getUserAddress() {
@@ -118,23 +135,24 @@ async function getUserAddress() {
 }
 
 async function connectWallet() {
-  await window.ethereum.request({ method: 'eth_requestAccounts' });
+  getChainId();
+  await window.ethereum.request({ method: "eth_requestAccounts" });
 }
 
 async function getSigner() {
   await connectWallet();
-  const signer = (new ethers.providers.Web3Provider(window.ethereum)).getSigner();
+  const signer = new ethers.providers.Web3Provider(window.ethereum).getSigner();
   return signer;
 }
 
-async function getContractInstance(contractName) {
+async function getContractInstance(contractName: "nft" | "marketplace") {
   const abi = ABIs[contractName];
   const address = await getContractAddress(contractName);
   const signer = await getSigner();
   return new ethers.Contract(address, abi, signer);
 }
 
-async function getContractAddress(contractName) {
+async function getContractAddress(contractName: "nft" | "marketplace") {
   const chainId = await getChainId();
   return chainId == LOCAL_NETWORK_ID
     ? localAddresses[contractName]
@@ -149,8 +167,7 @@ async function getChainId() {
 
   // Check if network is supported
   if (![LOCAL_NETWORK_ID, FUJI_NETWORK_ID].includes(chainId)) {
-    const errText =
-      `Please connect to local network or to Avalanche FUJI testnet and reload the page`;
+    const errText = `Please connect to local network or to Avalanche FUJI testnet and reload the page`;
     alert(errText);
     throw new Error(errText);
   }
@@ -160,13 +177,11 @@ async function getChainId() {
 
 export default {
   getOwnedNfts,
-  getOwnedNfts,
   mintNft,
   getAllOrders,
   postOrder,
   cancelOrder,
   buy,
-
   connectWallet,
   getUserAddress,
   shortenAddress,

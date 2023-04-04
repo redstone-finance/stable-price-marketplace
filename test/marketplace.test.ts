@@ -1,12 +1,16 @@
-const { expect } = require("chai");
-const { ethers } = require("hardhat");
+import { expect } from "chai";
+import { ethers } from "hardhat";
+import { BigNumber } from "ethers";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { ExampleNFT, Marketplace } from "../typechain-types";
 
 describe("Marketplace core functions test", function () {
-  let marketplaceContract,
-    exampleNFTContract,
-    nftContractAddress,
-    marketplaceAddress,
-    seller, buyer;
+  let marketplaceContract: Marketplace,
+    exampleNFTContract: ExampleNFT,
+    nftContractAddress: string,
+    marketplaceAddress: string,
+    seller: SignerWithAddress,
+    buyer: SignerWithAddress;
 
   const tokenId = 1;
 
@@ -34,9 +38,11 @@ describe("Marketplace core functions test", function () {
   });
 
   it("Seller should post sell order for token 1 with ETH price", async function () {
-
     // Approve NFT transfer
-    const approveTx = await exampleNFTContract.approve(marketplaceContract.address, tokenId);
+    const approveTx = await exampleNFTContract.approve(
+      marketplaceContract.address,
+      tokenId
+    );
     await approveTx.wait();
 
     // Post sell order
@@ -49,7 +55,9 @@ describe("Marketplace core functions test", function () {
     await postOrderTx.wait();
 
     // Check NFT owner (marketplace should own the NFT now)
-    expect(await exampleNFTContract.ownerOf(tokenId)).to.equal(marketplaceAddress);
+    expect(await exampleNFTContract.ownerOf(tokenId)).to.equal(
+      marketplaceAddress
+    );
   });
 
   it("Should get all orders", async function () {
@@ -65,9 +73,11 @@ describe("Marketplace core functions test", function () {
     const expectedAvaxAmount = await marketplaceContract.getPrice(orderId);
     logExpectedAmount(expectedAvaxAmount);
 
-    await expect(marketplaceContract.connect(buyer).buy(orderId, {
-      value: expectedAvaxAmount.mul(99).div(100), // We reduce the value by 1%
-    })).to.be.reverted;
+    await expect(
+      marketplaceContract.connect(buyer).buy(orderId, {
+        value: expectedAvaxAmount.mul(99).div(100), // We reduce the value by 1%
+      })
+    ).to.be.reverted;
   });
 
   it("Buyer should buy token 1 for AVAX price", async function () {
@@ -91,25 +101,26 @@ describe("Marketplace core functions test", function () {
     const tokenId = 1;
 
     // Approve NFT transfer
-    const approveTx = await exampleNFTContract.connect(buyer).approve(marketplaceContract.address, tokenId);
+    const approveTx = await exampleNFTContract
+      .connect(buyer)
+      .approve(marketplaceContract.address, tokenId);
     await approveTx.wait();
 
     // Post sell order
     const avaxPrice = ethers.utils.parseEther("1");
-    const postOrderTx = await marketplaceContract.connect(buyer).postSellOrder(
-      nftContractAddress,
-      tokenId,
-      avaxPrice
-    );
+    const postOrderTx = await marketplaceContract
+      .connect(buyer)
+      .postSellOrder(nftContractAddress, tokenId, avaxPrice);
     await postOrderTx.wait();
 
     // Cancel order
     const cancelTx = await marketplaceContract.connect(buyer).cancelOrder(1);
     await cancelTx.wait();
-  })
-
+  });
 });
 
-function logExpectedAmount(amount) {
-  console.log(`Expected AVAX amount: ${ethers.utils.formatEther(amount.toString())}`);
+function logExpectedAmount(amount: BigNumber) {
+  console.log(
+    `Expected AVAX amount: ${ethers.utils.formatEther(amount.toString())}`
+  );
 }

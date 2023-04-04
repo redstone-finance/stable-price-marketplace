@@ -119,3 +119,5 @@ artifacts
 .DS_Store
 
 .vercel
+
+typechain-types

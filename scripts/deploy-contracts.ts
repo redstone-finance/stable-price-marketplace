@@ -1,5 +1,5 @@
-const hre = require("hardhat");
-const fs = require("fs");
+import hre from "hardhat";
+import fs from "fs";
 
 async function main() {
   const nftContract = await deployContract("ExampleNFT");
@@ -12,20 +12,25 @@ async function main() {
   });
 }
 
-async function deployContract(name, ...args) {
+async function deployContract(name: string) {
   console.log(`Deploying contract: ${name}`);
   const ContractFactory = await hre.ethers.getContractFactory(name);
-  const deployedContract = await ContractFactory.deploy(...args);
-  console.log(`Deploy tx sent: ${deployedContract.address}. Waiting for confirmation...`);
+  const deployedContract = await ContractFactory.deploy();
+  console.log(
+    `Deploy tx sent: ${deployedContract.address}. Waiting for confirmation...`
+  );
   await deployedContract.deployed();
   console.log(`Deploy tx confirmed`);
   return deployedContract;
 }
 
-function updateAddressesFile(addresses) {
+function updateAddressesFile(addresses: { nft: string; marketplace: string }) {
   const addressesFilePath = `./src/config/${hre.network.name}-addresses.json`;
   console.log(`Saving addresses to ${addressesFilePath}`);
-  fs.writeFileSync(addressesFilePath, JSON.stringify(addresses, null, 2) + "\n");
+  fs.writeFileSync(
+    addressesFilePath,
+    JSON.stringify(addresses, null, 2) + "\n"
+  );
 }
 
 // We recommend this pattern to be able to use async/await everywhere
