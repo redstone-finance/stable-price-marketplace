@@ -77,33 +77,23 @@ The implementation is quite straightforward, so we won't describe it here. You c
 `StableMarketplace` is the marketplace contract with the stable price support. It extends the `Marketplace.sol` implementation and only overrides its `_getPriceFromOrder` function.
 
 ```js
-// `_getPriceFromOrder` function uses the `getPriceFromMsg` function,
+// `_getPriceFromOrder` function uses the `getOracleNumericValueFromTxMsg` function,
 // which fetches signed data from tx calldata and verifies its signature
 function _getPriceFromOrder(SellOrder memory order) internal view override returns (uint256)
 {
-    return (order.price / getPriceFromMsg(bytes32("AVAX"))) * (10**8);
+  uint256 ethPrice = getOracleNumericValueFromTxMsg(bytes32("ETH"));
+  return (order.price / ethPrice) * (10 ** 8);
 }
 ```
 
-For being able to use RedStone data, the contract extends the `PriceAware.sol` redstone contract.
+For being able to use RedStone data, the contract extends the `MainDemoConsumerBase.sol` redstone contract.
 
 ```js
-import "redstone-evm-connector/lib/contracts/message-based/PriceAware.sol";
+import "@redstone-finance/evm-connector/contracts/data-services/MainDemoConsumerBase.sol";
 import "./Marketplace.sol";
 
-contract StableMarketplace is Marketplace, PriceAware {
+contract StableMarketplace is Marketplace, MainDemoConsumerBase {
     ...
-}
-```
-
-It also overrides the `isSignerAuthorised` function from `PriceAware.sol` contract and specifies trusted data signer address.
-
-```js
-// You can check addresses for authorized redstone signers at:
-// https://github.com/redstone-finance/redstone-evm-connector/blob/master/README.md#1-modifying-your-contracts
-function isSignerAuthorized(address _signer) public pure override returns (bool)
-{
-    return _signer == 0x0C39486f770B26F5527BBBf942726537986Cd7eb;
 }
 ```
 
@@ -116,7 +106,7 @@ The main UI logic is located in the `App.js` file, and the contract interaction 
 If you take a look into the `blockchain.js` file code, you'll notice that each contract call that needs to process RedStone data is made on a contract instance, that was wrapped by [redstone-evm-connector](https://www.npmjs.com/package/redstone-evm-connector).
 
 ```js
-import { WrapperBuilder } from "redstone-evm-connector";
+import { WrapperBuilder } from "@redstone-finance/evm-connector";
 
 async function getContractInstance(contractName) {
   ...
@@ -129,8 +119,16 @@ async function buy(orderId) {
   // Wrapping marketplace contract instance.
   // It enables fetching data from redstone data pool
   // for each contract function call
-  const wrappedMarketplaceContract = WrapperBuilder.wrapLite(marketplace)
-    .usingPriceFeed("redstone", { asset: "AVAX" });
+  const wrappedMarketplaceContract = WrapperBuilder.wrap(
+    marketplace
+  ).usingDataService(
+    {
+      dataServiceId: "redstone-main-demo",
+      uniqueSignersCount: 1,
+      dataFeeds: ["ETH"],
+    },
+    ["https://d33trozg86ya9x.cloudfront.net"]
+  );
 
   // Checking expected amount
   const expectedAvaxAmount = await wrappedMarketplaceContract.getPrice(orderId);
